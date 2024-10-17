@@ -1,82 +1,92 @@
 # Hodiny na věži
 
+## Úkol
 Úkolem je realizovat funkci (ne celý program, pouze funkci), která bude počítat, kolikrát budou zvonit zvony na věži v zadaném časovém intervalu.
 
 Předpokládáme hodiny na věži, které dokáží zvonit na zvony a tím odbíjet čas. Hodiny jsou vybavené dvojicí zvonů:
 
-  zvon #1, který odbíjí minuty. Zvoní vždy v násobcích 15 minut, zvoní 1x až 4x (XX:00 - 4x, XX:15 - 1x, XX:30 - 2x a XX:45 - 3x).
-  zvon #2, který odbíjí hodiny, zvoní tolikrát, kolik ukazuje hodinová ručička. Tedy v půlnoci 12x, v 1:00 1x, ve 2:00 2x, ..., ve 12:00 12x, v 13:00 1x, ve 14:00 2x, ...,
-  v neděli je odbíjení po celý den vypnuté. Tedy naposledy se zvoní v sobotu v 23:45 a pak až v pondělí v 00:00.
-Naše funkce dostane parametrem dva časové údaje - počátek a konec časového intervalu. Počátek i konec je dán rokem, měsícem, dnem, hodinou a minutou. Funkce spočítá, kolikrát hodiny v tomto intervalu odbijí na jednom a na druhém zvonu. Pro výpočet uvažujeme uzavřený interval, tedy pokud se odbíjí na začátku/konci zadaného intervalu, do výsledku zahrneme i tato odbíjení.
+1. **Zvon #1**, který odbíjí minuty. Zvoní vždy v násobcích 15 minut, zvoní 1x až 4x:
+   - XX:00 - 4x
+   - XX:15 - 1x
+   - XX:30 - 2x
+   - XX:45 - 3x
 
-Požadovaná funkce má rozhraní:
+2. **Zvon #2**, který odbíjí hodiny. Zvoní tolikrát, kolik ukazuje hodinová ručička. Tedy v půlnoci 12x, v 1:00 1x, ve 2:00 2x, ..., ve 12:00 12x. Poté ve 13:00 1x, ve 14:00 2x, a tak dále.
 
-int bells ( int y1, int m1, int d1, int h1, int i1,
+V neděli je odbíjení po celý den vypnuté. Tedy naposledy se zvoní v sobotu ve 23:45 a pak až v pondělí v 00:00.
 
-         int y2, int m2, int d2, int h2, int i2, 
-         long long int * b1, long long int * b2 )
-y1, m1, d1, h1, i1
+## Rozhraní funkce
 
-  jsou vstupní parametry, které představují rok, měsíc, den, hodinu a minutu počátku intervalu,
-y2, m2, d2, h2, i2
+Funkce dostane parametrem dva časové údaje - počátek a konec časového intervalu. Počátek i konec je dán rokem, měsícem, dnem, hodinou a minutou. Funkce spočítá, kolikrát hodiny v tomto intervalu odbijí na jednom a na druhém zvonu. **Pro výpočet uvažujeme uzavřený interval**, tedy pokud se odbíjí na začátku/konci zadaného intervalu, do výsledku zahrneme i tato odbíjení.
 
-  jsou vstupní parametry, které představují rok, měsíc, den, hodinu a minutu konce intervalu,
-b1
+```c
+int bells(
+    int y1, int m1, int d1, int h1, int i1,
+    int y2, int m2, int d2, int h2, int i2,
+    long long int *b1, long long int *b2
+);
+```
 
-  je výstupní parametr, do kterého funkce uloží vypočtený počet odbití zvonu #1. Parametr bude funkce nastavovat pouze pokud jsou zadané správné vstupní parametry. Pokud jsou zadané nesprávné vstupy, nelze hodnotu určit. V takovém případě funkce signalizuje neúspěch a ponechá výstupní parametr beze změn.
-b2
+- `y1, m1, d1, h1, i1`: vstupní parametry představující rok, měsíc, den, hodinu a minutu počátku intervalu.
+- `y2, m2, d2, h2, i2`: vstupní parametry představující rok, měsíc, den, hodinu a minutu konce intervalu.
+- `b1`: výstupní parametr, do kterého funkce uloží vypočtený počet odbití zvonu #1.
+- `b2`: výstupní parametr, do kterého funkce uloží vypočtený počet odbití zvonu #2.
 
-  je výstupní parametr, do kterého funkce uloží vypočtený počet odbití zvonu #2. Parametr bude funkce nastavovat pouze pokud jsou zadané správné vstupní parametry. Pokud jsou zadané nesprávné vstupy, nelze hodnotu určit. V takovém případě funkce signalizuje neúspěch a ponechá výstupní parametr beze změn.
-návratová hodnota funkce
+Funkce bude nastavovat výstupní parametry pouze pokud jsou zadané vstupy správné. Pokud jsou zadané nesprávné vstupy, funkce signalizuje neúspěch a ponechá výstupní parametry beze změn.
 
-  bude nastavena na hodnotu 1 pro úspěch (správné vstupní parametry) nebo 0 pro neúspěch (nesprávné vstupní parametry).
-Pokud jsou zadané nesprávné vstupní parametry, je potřeba vrátit hodnotu 0 (neúspěch). Správné hodnoty vstupních parametrů musí splňovat:
+## Návratová hodnota
 
-  rok je větší roven 1600,
-  měsíc je platný (1 až 12),
-  den je platný (1 až počet dní v měsíci),
-  hodina je platná (0 až 23),
-  minuta je platná (0 až 59),
-  zadaný okamžik počátku intervalu nenastane až po zadaném okamžiku konce intervalu.
-Odevzdávejte zdrojový soubor, který obsahuje implementaci požadované funkce bells. Do zdrojového souboru přidejte i další Vaše podpůrné funkce, které jsou z bells volané. Funkce bude volaná z testovacího prostředí, je proto důležité přesně dodržet zadané rozhraní funkce. Za základ pro implementaci použijte kód z ukázky níže. V kódu chybí vyplnit funkci bells (a případné další podpůrné funkce). Ukázka obsahuje testovací funkci main, uvedené hodnoty jsou použité při základním testu. Všimněte si, že vkládání hlavičkových souborů a funkce main jsou zabalené v bloku podmíněného překladu (#ifdef/#endif). Prosím, ponechte bloky podmíněného překladu i v odevzdávaném zdrojovém souboru. Podmíněný překlad Vám zjednoduší práci. Při kompilaci na Vašem počítači můžete program normálně spouštět a testovat. Při kompilaci na Progtestu funkce main a vkládání hlavičkových souborů „zmizí“, tedy nebude kolidovat s hlavičkovými soubory a funkcí main testovacího prostředí.
+- Funkce vrací hodnotu `1`, pokud jsou všechny vstupní parametry správné a výpočet proběhl úspěšně.
+- Funkce vrací hodnotu `0`, pokud jsou vstupní parametry nesprávné nebo není možné výsledek určit. V takovém případě funkce ponechá výstupní parametry (`b1` a `b2`) beze změn.
 
-Při výpočtu času uvažujeme Gregoriánský kalendář. Tedy měsíce mají vždy 30 nebo vždy 31 dní, výjimkou je únor, který má 28 dní (nepřestupný rok) nebo 29 dní (přestupný rok). Podle Gregoriánského kalendáře platí:
+### Příklady nesprávných vstupů:
+- Rok je menší než 1600.
+- Měsíc je mimo platné rozmezí (1 až 12).
+- Den je mimo platné rozmezí (1 až počet dní v měsíci).
+- Hodina je mimo platné rozmezí (0 až 23).
+- Minuta je mimo platné rozmezí (0 až 59).
+- Počáteční okamžik intervalu je pozdější než koncový okamžik.
 
-  roky nejsou přestupné,
-  s výjimkou let dělitelných 4, které jsou přestupné,
-  s výjimkou let dělitelných 100, které nejsou přestupné,
-  s výjimkou let dělitelných 400, které jsou přestupné,
-  s výjimkou let dělitelných 4000, které nejsou přestupné. Toto pravidlo zatím ještě nikdy neuplatnilo a není zatím oficiálně přijaté. Je to jeden z uvažovaných návrhů, který by Gregoriánský kalendář přiblížil skutečnosti. V naší implementaci jej budeme uvažovat.
-Tedy roky 1901, 1902, 1903, 1905, … jsou nepřestupné (pravidlo 1), roky 1904, 1908, …, 1996, 2004, … jsou přestupné (pravidlo 2), roky 1700, 1800, 1900, 2100, … nejsou přestupné (pravidlo 3), roky 1600, 2000, 2400, …, 3600, 4400, … jsou přestupné (pravidlo 4) a roky 4000, 8000, … nejsou přestupné (pravidlo 5).
+## Příklad
 
-Váš program bude spouštěn v omezeném testovacím prostředí. Je omezen dobou běhu (limit je vidět v logu referenčního řešení) a dále je omezena i velikost dostupné paměti. Časové limity jsou nastavené tak, aby rozumná implementace naivního algoritmu prošla všemi povinnými testy. Řešení fungující v povinných testech může získat nominálních 100% bodů. Bonusové testy vyžadují časově efektivní výpočet i pro velké intervaly (vysoké roky hodně převyšující 4000).
+Testy pro mezní hodnoty:
 
-Ukázku použití naleznete v přiloženém souboru.:
+```c
+bells(2000, 12, 26, 0, 0, 2000, 12, 31, 0, 0, &b1, &b2);
+// Očekávaná návratová hodnota: 1
+// Očekávaný b1: 1200
+// Očekávaný b2: 780
 
-Nápověda
-  Zkopírujte si ukázku z přiloženého archivu a použijte ji jako základ Vašeho řešení.
-  Do funkce main si můžete doplnit i další Vaše testy, případně ji můžete libovolně změnit. Důležité je zachovat podmíněný překlad.
-  S pěticí hodnot (rok, měsíc, den, hodina, minuta) se špatně pracuje (například při porovnávání). Je lepší si tyto hodnoty převést na nějakou jinou reprezentaci, ideálně aby vzniklo pouze jedno číslo.
-  V programu musíte mnoho výpočtů dělat 2x - pro počátek a konec intervalu. Je dobrý nápad vytvořit si pomocné funkce, které 2x zavoláte.
-  V povinných testech jsou zadávané roky nepřevyšující rok 4000.
-  Základní řešení, které prochází veškeré okamžiky, kdy se odbíjí, je velmi pomalé a neprojde časovými limity. Není ale potřeba testovat každé odbíjení zvlášť. Vyplatí se např. předpočítat si odbíjení za jeden celý den a iterovat po dnech, případně po delších časových úsecích.
-  Pro velké intervaly (bonusový test) je počet odbití obrovský. Rozsah datového typu int nepostačuje. Proto má funkce parametrem long long int, který již stačí.
-  V přiloženém ukázkovém zdrojovém souboru je vidět seznam dostupných hlavičkových souborů. Jiné hlavičkové soubory nejsou k dispozici a ani je nejde pomocí #include dodatečně vložit. Všimněte si, že není k dispozici hlavičkový soubor time.h.
-  
-Test 'Test meznich hodnot':
-bells ( 2000, 12, 26, 0, 0, 2000, 12, 31, 0, 0, &b1, &b2 )
+bells(2000, 12, 27, 0, 0, 2000, 12, 27, 0, 0, &b1, &b2);
+// Očekávaná návratová hodnota: 1
+// Očekávaný b1: 4
+// Očekávaný b2: 12
+```
 
-return 1, b1=1200, b2=780
+Test s náhodnými daty:
 
-bells ( 2000, 12, 27, 0, 0, 2000, 12, 27, 0, 0, &b1, &b2 )
+```c
+bells(1932, 4, 8, 21, 50, 1980, 2, 26, 1, 22, &b1, &b2);
+// Očekávaná návratová hodnota: 1
+// Očekávaný b1: 3,597,635
+// Očekávaný b2: 2,338,474
 
-return 1, b1=4, b2=12
+bells(1954, 9, 13, 19, 30, 2012, 11, 11, 21, 6, &b1, &b2);
+// Očekávaná návratová hodnota: 1
+// Očekávaný b1: 4,370,205
+// Očekávaný b2: 2,840,642
+```
 
-Test 'Test nahodnymi daty':
-bells ( 1932, 4, 8, 21, 50, 1980, 2, 26, 1, 22, &b1, &b2 )
+## Doplňující poznámky
+- Při výpočtu času uvažujeme Gregoriánský kalendář. Měsíce mají buď 30 nebo 31 dní, s výjimkou února, který má buď 28 dní (v nepřestupném roce) nebo 29 dní (v přestupném roce).
+- Pravidla pro přestupný rok:
+  - Rok je přestupný, pokud je dělitelný 4, s výjimkou roků dělitelných 100. Nicméně roky dělitelné 400 jsou přestupné.
+  - Roky dělitelné 4000 nejsou přestupné, i když toto pravidlo ještě nikdy nebylo uplatněno a není oficiálně přijato.
 
-return 1, b1=3597635, b2=2338474
+Tedy roky 1600, 2000 a 2400 jsou přestupné, zatímco roky 1700, 1800, 1900 a 2100 nejsou.
 
-bells ( 1954, 9, 13, 19, 30, 2012, 11, 11, 21, 6, &b1, &b2 )
+## Optimalizace
 
-return 1, b1=4370205, b2=2840642
+Program bude spuštěn v omezeném testovacím prostředí s omezeným časem běhu a velikostí dostupné paměti. Časové limity jsou nastaveny tak, aby rozumná implementace naivního algoritmu prošla všemi povinnými testy. Pro větší intervaly (bonusové testy) může být počet odbití obrovský. Datový typ `long long int` je pro tento účel dostatečný.
+
+Pro efektivní zpracování velkých intervalů se vyplatí předpočítat si počet odbití za celý den a iterovat po dnech nebo delších časových úsecích. Naivní přístup, který by kontroloval každé jednotlivé odbití, by byl pro větší intervaly příliš pomalý, ale optimalizované algoritmy budou fungovat dobře jak pro povinné, tak pro bonusové testy.
